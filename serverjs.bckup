@@ -1,0 +1,35 @@
+const cookieSession = require("cookie-session");
+const express = require("express");
+const app = express();
+const hb = require("express-handlebars");
+const { hash, compere } = require("./bc");
+const COOKIE_SECRET =
+    process.env.COOKIE_SECRET || require("./secrets.json").COOKIE_SECRET;
+
+app.use(
+    cookieSession({
+        secret: COOKIE_SECRET,
+        maxAge: 1000 * 60 * 60 * 24 * 14,
+        sameSite: "strict",
+    })
+);
+
+app.use(
+    express.urlencoded({
+        extended: false,
+    })
+);
+
+// app.use(csurf());
+// app.use(function (req, res, next) {
+//     res.locals.csrfToken = req.csrfToken();
+//     next();
+// });
+
+app.engine("handlebars", hb());
+app.set("view engine", "handlebars");
+app.use(express.static("./public"));
+
+app.listen(process.env.PORT || 8080, () =>
+    console.log("blog up and running...")
+);
