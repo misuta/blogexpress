@@ -1,0 +1,22 @@
+<div class="login">
+</div>
+
+<form id="login" method="POST">
+    <label for="email">email</label>
+    <input type="email" name="email" id="email" placeholder="email" />
+    <label for="password">password</label>
+    <input
+        type="password"
+        name="password"
+        id="password"
+        placeholder="password"
+    />
+    <br />
+    <button type="submit">log in</button>
+    <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+    <h3>{{err}}</h3>
+</form>
+<br />
+<div class="login">
+    <a href="/register">| back |</a>
+</div>

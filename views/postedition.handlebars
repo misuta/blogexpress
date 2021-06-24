@@ -1,5 +1,26 @@
 <div>
-    <form action="" method="post">
+<!-- Include Editor style. -->
+{{!-- <link href="https://cdn.jsdelivr.net/npm/froala-editor@latest/css/froala_editor.pkgd.min.css" rel="stylesheet" type="text/css" /> --}}
+
+<!-- Create a tag that we will use as the editable area. -->
+<!-- You can use a div tag as well. -->
+{{!-- <form action="" method="post">
+    <textarea name="blogpost"></textarea>
+    <button type="submit">submit</button>
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+</form> --}}
+
+
+<!-- Include Editor JS files. -->
+{{!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/froala-editor@latest/js/froala_editor.pkgd.min.js"></script> --}}
+
+<!-- Initialize the editor. -->
+{{!-- <script>
+  new FroalaEditor('textarea');
+</script> --}}
+
+    <form action="" method="post" class="postall">
+        <input type="text" name="title" placeholder="Title">
         <textarea name="blogpost" id="" cols="30" rows="10"></textarea>
         <button type="submit">Submit</button>
         <input type="hidden" name="_csrf" value="{{csrfToken}}">

@@ -7,13 +7,16 @@ CREATE TABLE users(
       last_name VARCHAR(255) NOT NULL,
       email VARCHAR(255) NOT NULL UNIQUE,
       password VARCHAR(255) NOT NULL,
+      admin BOOLEAN NOT NULL DEFAULT FALSE,
+      editor BOOLEAN NOT NULL DEFAULT FALSE,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE blog(
       id SERIAL PRIMARY KEY,
+      title VARCHAR NOT NULL,
       post TEXT NOT NULL,
-      user_id INTEGER NOT NULL UNIQUE REFERENCES users(id),
+      user_id INTEGER NOT NULL REFERENCES users(id),
       image VARCHAR,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
