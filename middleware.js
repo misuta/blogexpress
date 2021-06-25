@@ -22,10 +22,10 @@ module.exports.requireLoggedOutUser = (req, res, next) => {
 //     }
 // };
 
-// module.exports.requireSignature = (req, res, next) => {
-//     if (!req.session.signed) {
-//         res.redirect("/petition");
-//     } else {
-//         next();
-//     }
-// };
+module.exports.requireEditor = (req, res, next) => {
+    if (!req.session.editor) {
+        res.redirect("/blog");
+    } else {
+        next();
+    }
+};

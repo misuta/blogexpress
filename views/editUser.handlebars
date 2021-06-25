@@ -1,0 +1,15 @@
+<div>
+    <form action="" method="post">
+        <input type="text" name="first_name" value="{{user.first_name}}">
+        <input type="text" name="last_name" value="{{user.last_name}}">
+        <input type="email" name="email" value="{{user.email}}">
+        {{#if isadmin}}
+        <input type="checkbox" id="admin" name="admin" {{#if user.admin}}checked{{/if}}>
+        <label for="admin">admin</label>
+        <input type="checkbox" id="editor" name="editor" {{#if user.editor}}checked{{/if}}>
+        <label for="editor">editor</label>
+        {{/if}}
+        <button type="submit">submint</button>
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    </form>
+</div>

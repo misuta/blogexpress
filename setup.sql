@@ -14,7 +14,7 @@ CREATE TABLE users(
 
 CREATE TABLE blog(
       id SERIAL PRIMARY KEY,
-      title VARCHAR NOT NULL,
+      title TEXT NOT NULL,
       post TEXT NOT NULL,
       user_id INTEGER NOT NULL REFERENCES users(id),
       image VARCHAR,
