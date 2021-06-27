@@ -1,3 +1,8 @@
+*{
+    background-color: #1d3557;
+    color: #e63946;
+}
+
 #register {
     display: grid;
     margin-top: 4%;
@@ -18,4 +23,46 @@
 
 .postall input{
     width: 500px;
+}
+
+header {
+    /* text-align: right; */
+    display: flex;
+    justify-content: space-evenly;
+}
+/* ############################blogposts################### */
+.blogpostUl{
+
+}
+.blogpostsLi{
+    font-size: x-large;
+}
+/* ###################################search############## */
+.searchDiv{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 40px;
+}
+.searchDiv input{
+    background-color: #f1faee ;
+    font-size: xx-large;
+}
+.searchDiv button{
+    background-color: #f1faee ;
+    font-size: xx-large;
+}
+.searchlist {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.searchlist li{
+    font-size: xx-large;
+}
+#login{
+    margin-top: 40px;
+    display: grid;
+    align-items: center;
+    justify-content: center;
 }

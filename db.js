@@ -51,3 +51,9 @@ module.exports.getTitles = () => {
     const params = [];
     return db.query(q, params);
 };
+
+module.exports.findUser = (first_name) => {
+    const q = `SELECT id, first_name, last_name, admin, editor FROM users WHERE first_name ILIKE $1 OR last_name ILIKE $1 ORDER BY first_name ASC`;
+    const params = [`${first_name}%`];
+    return db.query(q, params);
+};

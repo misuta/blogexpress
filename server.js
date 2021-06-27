@@ -5,6 +5,7 @@ const hb = require("express-handlebars");
 const { hash, compare } = require("./bc");
 const csurf = require("csurf");
 const path = require("path");
+const favicon = require("serve-favicon");
 const { resolve } = require("path");
 const { decodeBase64 } = require("bcryptjs");
 const db = require("./db");
@@ -16,9 +17,12 @@ const {
     requireLoggedInUser,
     requireLoggedOutUser,
     requireEditor,
+    requireAdmin,
 } = require("./middleware");
 const COOKIE_SECRET =
     process.env.COOKIE_SECRET || require("./secrets.json").COOKIE_SECRET;
+
+app.use(favicon(path.join(__dirname, "public", "favicon.ico")));
 
 app.use(
     cookieSession({
@@ -45,9 +49,18 @@ app.set("view engine", "handlebars");
 app.use(express.static("./public"));
 
 app.get("/", (req, res) => {
-    res.render("blogpost", {
-        layout: "main",
-    });
+    db.getTitles()
+        .then((result) => {
+            // console.log("this is result in /blog", result.rows);
+            let titles = result.rows;
+            res.render("blogposts", {
+                layout: "main",
+                titles,
+            });
+        })
+        .catch((error) => {
+            console.log("this is an error in /blog ", error);
+        });
 });
 
 //##########################################registration#############################################################
@@ -138,10 +151,11 @@ app.post("/login", requireLoggedOutUser, (req, res) => {
             });
         });
 });
-//#####################################################blog posts####################################################
 
-app.get("/blog", (req, res) => {
-    // console.log("/blog is firing");
+app.get("/logout", (req, res) => {
+    req.session.userId = "";
+    req.session.editor = "";
+    req.session.admin = "";
     db.getTitles()
         .then((result) => {
             // console.log("this is result in /blog", result.rows);
@@ -155,27 +169,84 @@ app.get("/blog", (req, res) => {
             console.log("this is an error in /blog ", error);
         });
 });
+//#####################################################blog posts####################################################
+
+app.get("/blog", (req, res) => {
+    // console.log("/blog is firing");
+   if(!req.session.editor){
+        db.getTitles()
+            .then((result) => {
+                // console.log("this is result in /blog", result.rows);
+                let titles = result.rows;
+                let cookie = req.session.id;
+                res.render("blogposts", {
+                    layout: "main",
+                    titles,
+                    cookie,
+                });
+            })
+            .catch((error) => {
+                console.log("this is an error in /blog ", error);
+            });
+   }else{
+        db.getTitles()
+            .then((result) => {
+                // console.log("this is result in /blog", result.rows);
+                let titles = result.rows;
+                let cookie = req.session.id;
+                res.render("blogposts", {
+                    layout: "editor",
+                    titles,
+                    cookie,
+                });
+            })
+            .catch((error) => {
+                console.log("this is an error in /blog ", error);
+            });
+   }
+});
 
 app.get("/blog/:post", (req, res) => {
     // console.log("this is params in /blog/:post", req.params);
-    db.getPost(req.params.post)
-        .then((result) => {
-            // console.log("this is result.rows in /blog", result.rows[0].post);
-            let title = result.rows[0].title;
-            let blog = marked(result.rows[0].post);
-            let editor = req.session.editor;
-            let id = req.params.post;
-            res.render("blogpost", {
-                layout: "main",
-                id,
-                editor,
-                title,
-                blog,
+   if(!req.session.editor) {
+        db.getPost(req.params.post)
+            .then((result) => {
+                // console.log("this is result.rows in /blog", result.rows[0].post);
+                let title = result.rows[0].title;
+                let blog = marked(result.rows[0].post);
+                let editor = req.session.editor;
+                let id = req.params.post;
+                res.render("blogpost", {
+                    layout: "main",
+                    id,
+                    editor,
+                    title,
+                    blog,
+                });
+            })
+            .catch((error) => {
+                console.log("this is an error in /blog/:post ", error);
             });
-        })
-        .catch((error) => {
-            console.log("this is an error in /blog/:post ", error);
-        });
+   }else {
+        db.getPost(req.params.post)
+            .then((result) => {
+                // console.log("this is result.rows in /blog", result.rows[0].post);
+                let title = result.rows[0].title;
+                let blog = marked(result.rows[0].post);
+                let editor = req.session.editor;
+                let id = req.params.post;
+                res.render("blogpost", {
+                    layout: "editor",
+                    id,
+                    editor,
+                    title,
+                    blog,
+                });
+            })
+            .catch((error) => {
+                console.log("this is an error in /blog/:post ", error);
+            });
+   }
 });
 
 app.get("/post", requireLoggedInUser, requireEditor, (req, res) => {
@@ -218,7 +289,7 @@ app.get("/edit/post/:id", requireLoggedInUser, requireEditor, (req, res) => {
             editor = true;
         }
         res.render("editpost", {
-            layout: "main",
+            layout: "editor",
             editor,
             id,
             title,
@@ -227,7 +298,7 @@ app.get("/edit/post/:id", requireLoggedInUser, requireEditor, (req, res) => {
     });
 });
 
-app.post("/edit/post/:id", (req, res) => {
+app.post("/edit/post/:id", requireLoggedInUser, requireEditor, (req, res) => {
     // console.log("this is /edit/post/:id firing");
     // console.log("this is req.body.blogpost", req.body.blogpost);
     // console.log(
@@ -255,10 +326,10 @@ app.post("/edit/post/:id", (req, res) => {
 
 //#################################Edit User############################################
 
-app.get("/edit/:user", (req, res) => {
+app.get("/edit/user/:id", requireLoggedInUser, requireAdmin, (req, res) => {
     // console.log("this is req.params in /edit/:user ", req.params);
     let isadmin = req.session.admin;
-    db.getUser(req.params.user)
+    db.getUser(req.params.id)
         .then((result) => {
             // console.log("this is result in /edit/:user", result.rows)
             let user = result.rows[0];
@@ -272,7 +343,7 @@ app.get("/edit/:user", (req, res) => {
             console.log("error in /edit/:user", error);
         });
 });
-app.post("/edit/:user", (req, res) => {
+app.post("/edit/user/:id", requireLoggedInUser, requireAdmin, (req, res) => {
     // console.log("################this is req.params in /edit/:user################ ", req.params);
     // console.log("################this is req.params in /edit/:user################ ", req.body);
     let isadmin = req.session.admin;
@@ -289,7 +360,7 @@ app.post("/edit/:user", (req, res) => {
         admin = false;
     }
     // req.body = { ...req.body, admin: req.body.admin === "on" };
-    db.updateUser(req.params.user, admin, editor)
+    db.updateUser(req.params.id, admin, editor)
         .then((result) => {
             console.log("this is req.body in updateUser", req.body);
             console.log("this is result inside updateuser", result.rows);
@@ -317,6 +388,32 @@ app.post("/edit/:user", (req, res) => {
             console.log("error in /edit/:user", error);
         });
 });
+
+//##################################################search########################################################
+
+app.get("/search", (req, res) => {
+    console.log("search is firing");
+    res.render("search", {
+        layout: "main",
+    });
+});
+
+app.post("/search", (req, res) => {
+    console.log(req.body);
+    db.findUser(req.body.search)
+        .then((result) => {
+            console.log("this is result in search", result.rows);
+            let users = result.rows;
+            res.render("search", {
+                layout: "main",
+                users,
+            });
+        })
+        .catch((error) => {
+            console.log("error in search", error);
+        });
+});
+
 app.listen(process.env.PORT || 8080, () =>
     console.log("blog up and running...")
 );

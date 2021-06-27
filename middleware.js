@@ -14,13 +14,13 @@ module.exports.requireLoggedOutUser = (req, res, next) => {
     }
 };
 
-// module.exports.requireNoSignature = (req, res, next) => {
-//     if (req.session.signed) {
-//         res.redirect("/thanks");
-//     } else {
-//         next();
-//     }
-// };
+module.exports.requireAdmin = (req, res, next) => {
+    if (!req.session.admin) {
+        res.redirect("/blog");
+    } else {
+        next();
+    }
+};
 
 module.exports.requireEditor = (req, res, next) => {
     if (!req.session.editor) {
