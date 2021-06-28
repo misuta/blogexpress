@@ -3,14 +3,14 @@ const db = spicedPg(
     process.env.DATABASE_URL || "postgres:postgres:postgres@localhost:5432/blog"
 );
 
-module.exports.setPost = (title, post, user_id, image) => {
-    const q = `INSERT INTO blog (title, post, user_id, image) values($1, $2, $3, $4) RETURNING *`;
-    const params = [title, post, user_id, image || null];
+module.exports.setPost = (title, post, user_id, pubish, image) => {
+    const q = `INSERT INTO blog (title, post, user_id, pubish, image) values($1, $2, $3, $4, $5) RETURNING *`;
+    const params = [title, post, user_id, pubish || false, image || null];
     return db.query(q, params);
 };
-module.exports.updatePost = (id, title, post) => {
+module.exports.updatePost = (id, title, post, pubish) => {
     const q = `UPDATE blog SET title = $2, post = $3 WHERE id = $1 `;
-    const params = [id, title, post];
+    const params = [id, title, post, pubish];
     return db.query(q, params);
 };
 module.exports.updateUser = (id, admin, editor) => {

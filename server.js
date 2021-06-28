@@ -264,9 +264,18 @@ app.post("/post", requireLoggedInUser, requireEditor, (req, res) => {
     //     req.body,
     //     req.session.userId
     // );
-    db.setPost(req.body.title, req.body.blogpost, req.session.userId)
+    console.log("this is /post firing");
+    console.log("this is req.body in /post ", req.body);
+    let publish = false;
+    if (req.body.publish == "on") {
+        pubish = true;
+    } else {
+        pubish = false;
+    }
+    db.setPost(req.body.title, req.body.blogpost, req.session.userId, publish)
         .then((result) => {
-            // console.log("this is blogpost in /post", result.rows[0]);
+            console.log("this is blogpost in /post", result.rows[0]);
+            console.log(result.rows);
             res.redirect(`/blog/${result.rows[0].id}`);
         })
         .catch((error) => {

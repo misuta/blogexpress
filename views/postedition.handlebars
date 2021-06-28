@@ -22,6 +22,8 @@
     <form action="" method="post" class="postall">
         <input type="text" name="title" placeholder="Title">
         <textarea name="blogpost" id="" cols="30" rows="10"></textarea>
+        <input type="checkbox" name="publish" id="publish" {{#if publish}}checked{{/if}}>
+        <label for="publish">Publish</label>
         <button type="submit">Submit</button>
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
     </form>
