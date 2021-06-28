@@ -1,4 +1,4 @@
-*{
+* {
     background-color: #1d3557;
     color: #e63946;
 }
@@ -12,7 +12,7 @@
     align-items: center;
 }
 
-.register p{
+.register p {
     text-align: center;
 }
 
@@ -21,7 +21,7 @@
     justify-content: center;
 }
 
-.postall input{
+.posttextarea {
     width: 500px;
 }
 
@@ -31,25 +31,24 @@ header {
     justify-content: space-evenly;
 }
 /* ############################blogposts################### */
-.blogpostUl{
-
+.blogpostUl {
 }
-.blogpostsLi{
+.blogpostsLi {
     font-size: x-large;
 }
 /* ###################################search############## */
-.searchDiv{
+.searchDiv {
     display: flex;
     justify-content: center;
     align-items: center;
     margin: 40px;
 }
-.searchDiv input{
-    background-color: #f1faee ;
+.searchDiv input {
+    background-color: #f1faee;
     font-size: xx-large;
 }
-.searchDiv button{
-    background-color: #f1faee ;
+.searchDiv button {
+    background-color: #f1faee;
     font-size: xx-large;
 }
 .searchlist {
@@ -57,12 +56,15 @@ header {
     justify-content: center;
     align-items: center;
 }
-.searchlist li{
+.searchlist li {
     font-size: xx-large;
 }
-#login{
+#login {
     margin-top: 40px;
     display: grid;
     align-items: center;
     justify-content: center;
+}
+
+.publishbox {
 }

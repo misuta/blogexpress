@@ -29,3 +29,24 @@ module.exports.requireEditor = (req, res, next) => {
         next();
     }
 };
+
+module.exports.loggedIn = (req, res, next) => {
+    if(req.session.userId){
+        res.locals.loggedIn = true;
+        
+    }else{
+        res.locals.loggedIn = false;
+    }
+
+    next();
+}
+
+module.exports.admin = (req, res, next) => {
+    if (req.session.admin) {
+        res.locals.admin = true;
+    } else {
+        res.locals.admin = false;
+    }
+
+    next();
+}

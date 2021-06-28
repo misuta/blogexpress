@@ -3,14 +3,14 @@ const db = spicedPg(
     process.env.DATABASE_URL || "postgres:postgres:postgres@localhost:5432/blog"
 );
 
-module.exports.setPost = (title, post, user_id, pubish, image) => {
-    const q = `INSERT INTO blog (title, post, user_id, pubish, image) values($1, $2, $3, $4, $5) RETURNING *`;
-    const params = [title, post, user_id, pubish || false, image || null];
+module.exports.setPost = (title, post, user_id, publish, image) => {
+    const q = `INSERT INTO blog (title, post, user_id, publish, image) values($1, $2, $3, $4, $5) RETURNING *`;
+    const params = [title, post, user_id, publish || false, image || null];
     return db.query(q, params);
 };
-module.exports.updatePost = (id, title, post, pubish) => {
-    const q = `UPDATE blog SET title = $2, post = $3 WHERE id = $1 `;
-    const params = [id, title, post, pubish];
+module.exports.updatePost = (id, title, post, publish) => {
+    const q = `UPDATE blog SET title = $2, post = $3, publish = $4 WHERE id = $1 `;
+    const params = [id, title, post, publish || false];
     return db.query(q, params);
 };
 module.exports.updateUser = (id, admin, editor) => {
@@ -47,13 +47,25 @@ module.exports.getPassword = (email) => {
 };
 
 module.exports.getTitles = () => {
-    const q = `SELECT id, title FROM blog`;
+    const q = `SELECT id, title FROM blog where blog.publish = TRUE`;
     const params = [];
     return db.query(q, params);
 };
+
+module.exports.getAll = () =>{
+    const q = `SELECT * FROM blog`;
+    const params = [];
+    return db.query(q, params);
+}
 
 module.exports.findUser = (first_name) => {
     const q = `SELECT id, first_name, last_name, admin, editor FROM users WHERE first_name ILIKE $1 OR last_name ILIKE $1 ORDER BY first_name ASC`;
     const params = [`${first_name}%`];
     return db.query(q, params);
 };
+
+module.exports.deletePost = (id) => {
+    const q = `DELETE FROM blog WHERE id = $1`;
+    const params = [id]
+    return db.query(q, params);
+}

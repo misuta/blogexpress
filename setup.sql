@@ -17,7 +17,7 @@ CREATE TABLE blog(
       title TEXT NOT NULL,
       post TEXT NOT NULL,
       user_id INTEGER NOT NULL REFERENCES users(id),
-      pubish BOOLEAN NOT NULL DEFAULT FALSE,
+      publish BOOLEAN NOT NULL DEFAULT FALSE,
       image VARCHAR,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

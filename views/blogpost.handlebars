@@ -1,6 +1,13 @@
 <div>
-   <h1>{{title}}</h1> 
+    <h1>{{title}}</h1>
     {{{blog}}}
 
-    {{#if editor}} <a href="/edit/post/{{id}}">edit</a> {{/if}}
+    {{#if editor}}<button
+            onclick="window.location.href='/edit/post/{{id}}'"
+        >Edit</button>{{/if}}
+    {{#if editor}}
+        <button
+            onclick="window.location.href='/delete/post/{{id}}'"
+        >Delete</button>
+    {{/if}}
 </div>

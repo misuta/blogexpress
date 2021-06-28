@@ -12,12 +12,12 @@
         id="password"
         placeholder="password"
     />
-    
+
     <button type="submit">sign up</button>
-    <input type="hidden" name="_csrf" value="{{csrfToken}}"> 
+    <input type="hidden" name="_csrf" value="{{csrfToken}}" />
 </form>
-<br>
- <div class="register">
-     <p>If you have an account <a href="/login">log in</a></p>
-     <h3>{{err}}</h3>
- </div>
+<br />
+<div class="register">
+    {{! <p>If you have an account <a href="/login">log in</a></p> }}
+    <h3>{{err}}</h3>
+</div>
