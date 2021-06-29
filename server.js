@@ -241,9 +241,12 @@ app.post("/post", requireLoggedInUser, requireEditor, (req, res) => {
 
 app.get("/edit/post/:id", requireLoggedInUser, requireEditor, (req, res) => {
     db.getPost(req.params.id).then((result) => {
-        let id = result.rows[0].id;
-        let title = result.rows[0].title;
-        let blog = wrap(result.rows[0].post);
+        // let id = result.rows[0].id;
+        // let title = result.rows[0].title;
+        // let publish = result.rows[0].publish
+        // let blog = wrap(result.rows[0].post, {trim: true});
+        let blog = result.rows[0];
+        console.log("this is blog in edit/post/:id ", blog);
         let editor;
         if (
             req.session.userId === result.rows[0].user_id ||
@@ -253,9 +256,6 @@ app.get("/edit/post/:id", requireLoggedInUser, requireEditor, (req, res) => {
         }
         res.render("editpost", {
             layout: "editor",
-            editor,
-            id,
-            title,
             blog,
         });
     });

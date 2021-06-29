@@ -6,10 +6,10 @@
             class='posttextarea'
             cols='30'
             rows='10'
-        >{{blog}}</textarea>
+        >{{blog.post}}</textarea>
         <div class='publishbox'>
-            <label for='publish'>Publish</label>
-            <input type='checkbox' name='publish' id='publish' />
+            <label for='publish' >Publish</label> 
+            <input type='checkbox' name='publish' id='publish' {{#if blog.publish }}checked{{/if}} />
         </div>
         <button type='submit'>Submit</button>
         <input type='hidden' name='_csrf' value='{{csrfToken}}' />
