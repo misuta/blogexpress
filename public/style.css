@@ -51,11 +51,11 @@ header {
     background-color: #f1faee;
     font-size: xx-large;
 }
-.searchlist {
+/* .searchlist {
     display: flex;
     justify-content: center;
     align-items: center;
-}
+} */
 .searchlist li {
     font-size: xx-large;
 }
@@ -67,4 +67,11 @@ header {
 }
 
 .publishbox {
+}
+
+.succeed{
+    text-align: center;
+}
+.editUser{
+    display: flex;
 }

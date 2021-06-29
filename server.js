@@ -13,6 +13,10 @@ const marked = require("marked");
 const sanitizeHtml = require("sanitize-html");
 const html2md = require("html-to-md");
 var wrap = require("word-wrap");
+const createDOMPurify = require("dompurify");
+const { JSDOM } = require("jsdom");
+const window = new JSDOM("").window;
+const DOMPurify = createDOMPurify(window);
 const {
     requireLoggedInUser,
     requireLoggedOutUser,
@@ -143,78 +147,111 @@ app.get("/logout", (req, res) => {
     req.session.admin = "";
     res.redirect("/");
 });
+//####################################################Post by Author#################################################
+
+app.get("/author/:id", (req, res) => {
+    console.log("this is params in /author/:id", req.params.id);
+    db.getAuthor(req.params.id)
+        .then((result) => {
+            console.log("this is result.rows in /author/:id ", result.rows);
+            let info = result.rows;
+            if (req.session.editor) {
+                res.render("author", {
+                    layout: "editor",
+                    info,
+                });
+            } else {
+                res.render("author", {
+                    layout: "main",
+                    info,
+                });
+            }
+        })
+        .catch((error) => {
+            console.log("error in /author/:id ", error);
+        });
+});
+
 //#####################################################blog posts####################################################
 
 app.get("/blog", (req, res) => {
-    if (!req.session.editor) {
-        db.getTitles()
-            .then((result) => {
-                let titles = result.rows;
-                let cookie = req.session.id;
-                res.render("blogposts", {
-                    layout: "main",
-                    titles,
-                    cookie,
-                });
-            })
-            .catch((error) => {
-                console.log("this is an error in /blog ", error);
-            });
-    } else {
-        db.getTitles()
-            .then((result) => {
-                let titles = result.rows;
-                let cookie = req.session.id;
+    // if (!req.session.editor) {
+    db.getTitles()
+        .then((result) => {
+            let titles = result.rows;
+            let cookie = req.session.id;
+            if (req.session.editor) {
                 res.render("blogposts", {
                     layout: "editor",
                     titles,
                     cookie,
                 });
-            })
-            .catch((error) => {
-                console.log("this is an error in /blog ", error);
-            });
-    }
+            } else {
+                res.render("blogposts", {
+                    layout: "main",
+                    titles,
+                    cookie,
+                });
+            }
+        })
+        .catch((error) => {
+            console.log("this is an error in /blog ", error);
+        });
+    // } else {
+    //     db.getTitles()
+    //         .then((result) => {
+    //             let titles = result.rows;
+    //             let cookie = req.session.id;
+    //             res.render("blogposts", {
+    //                 layout: "editor",
+    //                 titles,
+    //                 cookie,
+    //             });
+    //         })
+    //         .catch((error) => {
+    //             console.log("this is an error in /blog ", error);
+    //         });
+    // }
 });
 
 app.get("/blog/:post", (req, res) => {
-    if (!req.session.editor) {
-        db.getPost(req.params.post)
-            .then((result) => {
-                let title = result.rows[0].title;
-                let blog = marked(result.rows[0].post);
-                let editor = req.session.editor;
-                let id = req.params.post;
-                res.render("blogpost", {
-                    layout: "main",
-                    id,
-                    editor,
-                    title,
-                    blog,
-                });
-            })
-            .catch((error) => {
-                console.log("this is an error in /blog/:post ", error);
-            });
-    } else {
-        db.getPost(req.params.post)
-            .then((result) => {
-                let title = result.rows[0].title;
-                let blog = marked(result.rows[0].post);
-                let editor = req.session.editor;
-                let id = req.params.post;
+    console.log("this is req.params.post in blog/:post", req.params.post);
+    db.getPost(req.params.post)
+        .then((result) => {
+            console.log("this is result in blog/:post ", result.rows);
+            let title = result.rows[0].title;
+            let info = result.rows[0];
+            console.log("this is result in blog/:post ", info);
+            let name = `${result.rows[0].first_name} ${result.rows[0].last_name}`;
+            let blog = DOMPurify.sanitize(marked(result.rows[0].post));
+            let editor = req.session.editor;
+            let id = req.params.post;
+            // let info = result.rows[0];
+            if (req.session.editor) {
                 res.render("blogpost", {
                     layout: "editor",
                     id,
                     editor,
                     title,
                     blog,
+                    name,
+                    info,
                 });
-            })
-            .catch((error) => {
-                console.log("this is an error in /blog/:post ", error);
-            });
-    }
+            } else {
+                res.render("blogpost", {
+                    layout: "main",
+                    id,
+                    editor,
+                    title,
+                    blog,
+                    name,
+                    info,
+                });
+            }
+        })
+        .catch((error) => {
+            console.log("this is an error in /blog/:post ", error);
+        });
 });
 
 app.get("/post", requireLoggedInUser, requireEditor, (req, res) => {
@@ -241,12 +278,12 @@ app.post("/post", requireLoggedInUser, requireEditor, (req, res) => {
 
 app.get("/edit/post/:id", requireLoggedInUser, requireEditor, (req, res) => {
     db.getPost(req.params.id).then((result) => {
-        // let id = result.rows[0].id;
-        // let title = result.rows[0].title;
-        // let publish = result.rows[0].publish
+        let id = result.rows[0].id;
+        let title = result.rows[0].title;
+        let publish = result.rows[0].publish;
         // let blog = wrap(result.rows[0].post, {trim: true});
-        let blog = result.rows[0];
-        console.log("this is blog in edit/post/:id ", blog);
+        let blog = result.rows[0].post;
+        console.log("this is publish in edit/post/:id ", publish);
         let editor;
         if (
             req.session.userId === result.rows[0].user_id ||
@@ -256,7 +293,11 @@ app.get("/edit/post/:id", requireLoggedInUser, requireEditor, (req, res) => {
         }
         res.render("editpost", {
             layout: "editor",
+            editor,
+            id,
+            title,
             blog,
+            publish,
         });
     });
 });
@@ -286,7 +327,7 @@ app.get("/allposts", requireLoggedInUser, requireEditor, (req, res) => {
             let titles = result.rows;
             let cookie = req.session.id;
             res.render("blogposts", {
-                layout: "main",
+                layout: "editor",
                 titles,
                 cookie,
             });
@@ -301,11 +342,13 @@ app.get(
     requireLoggedInUser,
     requireEditor,
     (req, res) => {
-        db.deletePost(req.params.post).then((result) => {
-            res.redirect("/");
-        }).catch((error) => {
-            console.log("error in delePost ", error)
-        });
+        db.deletePost(req.params.post)
+            .then((result) => {
+                res.redirect("/");
+            })
+            .catch((error) => {
+                console.log("error in delePost ", error);
+            });
     }
 );
 //#################################Edit User############################################
@@ -344,11 +387,14 @@ app.post("/edit/user/:id", requireLoggedInUser, requireAdmin, (req, res) => {
             db.getUser(result.rows[0].id)
                 .then((results) => {
                     let user = results.rows[0];
-                    res.render("editUser", {
-                        layout: "main",
-                        isadmin,
-                        user,
-                    });
+                    let alert = true;
+                    res.redirect("/succeed");
+                    // res.render("editUser", {
+                    //     layout: "main",
+                    //     isadmin,
+                    //     user,
+                    //     alert,
+                    // });
                 })
                 .catch((error) => {
                     console.log(
@@ -361,7 +407,33 @@ app.post("/edit/user/:id", requireLoggedInUser, requireAdmin, (req, res) => {
             console.log("error in /edit/:user", error);
         });
 });
+app.get("/succeed", (req, res) => {
+    res.render("succeed", {
+        layout: "editor",
+    });
+});
 
+app.get(
+    "/delete/user/:id",
+    requireLoggedInUser,
+    requireEditor,
+    (req, res) => {
+        db.deletePostFromUser(req.params.id).then((result) => {
+            db.deleteUser(req.params.id)
+                .then((result) => {
+                    res.render("deleteUser", {
+                        layout: "editor",
+                    });
+                })
+                .catch((error) => {
+                    console.log("error in delete/user/:id ", error);
+                });
+        }).catch((error) => {
+            console.log("error in delete/user/:id", error);
+        })
+        
+    }
+);
 //##################################################search########################################################
 
 app.get("/search", (req, res) => {

@@ -1,4 +1,4 @@
-<div>
+<div class="editUser">
     <form action="" method="post">
         <input type="text" name="first_name" value="{{user.first_name}}">
         <input type="text" name="last_name" value="{{user.last_name}}">
@@ -10,6 +10,17 @@
         <label for="editor">editor</label>
         {{/if}}
         <button type="submit">submint</button>
+        
         <input type="hidden" name="_csrf" value="{{csrfToken}}">
     </form>
+    {{#if isadmin}}
+        <button
+            onclick="window.location.href='/delete/user/{{user.id}}'"
+        >Delete</button>
+    {{/if}}
+    {{!-- {{#if alert}}
+        <script>
+        alert("That worked!");
+        </script>
+    {{/if}} --}}
 </div>

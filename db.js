@@ -4,6 +4,7 @@ const db = spicedPg(
 );
 
 module.exports.setPost = (title, post, user_id, publish, image) => {
+    console.log(title, post, user_id, publish, image);
     const q = `INSERT INTO blog (title, post, user_id, publish, image) values($1, $2, $3, $4, $5) RETURNING *`;
     const params = [title, post, user_id, publish || false, image || null];
     return db.query(q, params);
@@ -30,6 +31,7 @@ module.exports.addUser = (first_name, last_name, email, password) => {
 };
 
 module.exports.getPost = (id) => {
+    console.log("#############id######", id)
     const q = `SELECT * FROM blog JOIN users ON (blog.user_id = users.id) WHERE blog.id = $1`;
     const params = [id];
     return db.query(q, params);
@@ -57,6 +59,11 @@ module.exports.getAll = () =>{
     const params = [];
     return db.query(q, params);
 }
+module.exports.getAuthor = (user_id) =>{
+    const q = `SELECT * FROM blog WHERE user_id = $1`;
+    const params = [user_id];
+    return db.query(q, params);
+}
 
 module.exports.findUser = (first_name) => {
     const q = `SELECT id, first_name, last_name, admin, editor FROM users WHERE first_name ILIKE $1 OR last_name ILIKE $1 ORDER BY first_name ASC`;
@@ -68,4 +75,14 @@ module.exports.deletePost = (id) => {
     const q = `DELETE FROM blog WHERE id = $1`;
     const params = [id]
     return db.query(q, params);
-}
+};
+module.exports.deleteUser = (id) => {
+    const q = `DELETE FROM users WHERE id = $1`;
+    const params = [id]
+    return db.query(q, params);
+};
+module.exports.deletePostFromUser = (id) => {
+    const q = `DELETE FROM blog WHERE user_id = $1`;
+    const params = [id];
+    return db.query(q, params);
+};
